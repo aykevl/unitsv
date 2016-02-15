@@ -31,15 +31,9 @@ package unitsv
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"io"
 	"net/textproto"
 	"strings"
-)
-
-var (
-	ErrParsingTSV = errors.New("unitsv: failed to parse")
-	ErrColumns    = errors.New("unitsv: missing columns")
 )
 
 // Reader implements the TSV reader.

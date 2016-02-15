@@ -1,4 +1,4 @@
-// unitsv.go
+// writer.go
 //
 // Copyright (c) 2016, Ayke van Laethem
 // All rights reserved.
@@ -26,18 +26,68 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// UniTSV is a simple library for reading and writing files in a TSV-like
-// format. The only differences with standard TSV (as specified by IANA) is that
-// it supports newlines and tabs via escape characters (\n, \t, \\) and that it
-// only uses UTF-8 instead of ASCII (as UTF-8 is the default in Go).
 package unitsv
 
 import (
-	"errors"
+	"bufio"
 )
 
-var (
-	ErrColumns          = errors.New("unitsv: missing columns")
-	ErrInvalidRowLength = errors.New("unitsv: row not the same length as header")
-	ErrParsingTSV       = errors.New("unitsv: failed to parse")
-)
+type Writer struct {
+	writer       *bufio.Writer
+	headerLength int
+}
+
+// NewWriter writes the header and returns a new Writer.
+func NewWriter(out *bufio.Writer, columns []string) (*Writer, error) {
+	w := &Writer{
+		writer:       out,
+		headerLength: len(columns),
+	}
+
+	err := w.WriteRow(columns)
+	if err != nil {
+		return nil, err
+	}
+
+	return w, nil
+}
+
+// WriteRow writes a singe row of fields to the file. It checks whether the row
+// has the right size.
+func (w *Writer) WriteRow(row []string) error {
+	if len(row) != w.headerLength {
+		return ErrInvalidRowLength
+	}
+
+	// It might be possible to optimize this a lot, but that's not yet relevant
+	// for me.
+	for i, field := range row {
+		if i > 0 {
+			w.writer.WriteString("\t")
+		}
+
+		for _, c := range field {
+			switch c {
+			case '\n':
+				w.writer.WriteString("\\n")
+			case '\t':
+				w.writer.WriteString("\\t")
+			case '\\':
+				w.writer.WriteString("\\\\")
+			default:
+				w.writer.WriteRune(c)
+			}
+		}
+	}
+
+	// This will catch any errors: bufio.Writer ensures that subsequent writes
+	// after an error will return that error.
+	_, err := w.writer.WriteString("\n")
+	return err
+}
+
+// Flush flushes the underlying bufio.Writer. This is only necessary if you
+// don't flush it yourself.
+func (w *Writer) Flush() error {
+	return w.writer.Flush()
+}

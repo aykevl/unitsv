@@ -30,8 +30,8 @@ package unitsv
 
 import (
 	"bufio"
+	"bytes"
 	"io"
-	"strings"
 	"testing"
 )
 
@@ -42,20 +42,25 @@ u		x
 \t	\n	\\n
 `
 var testHeaders = []string{"header2", "header", "abc"}
-var testParsed = [][]string{
+var testData = [][]string{
 	{"a", "1", "3002234232222342"},
 	{"", "u", "x"},
 	{"...", "ü", "n"},
 	{"\n", "\t", "\\n"},
 }
+var testOutput = `header2	header	abc
+a	1	3002234232222342
+	u	x
+...	ü	n
+\n	\t	\\n
+`
 
 func TestReader(t *testing.T) {
-	infile := strings.NewReader(testInput)
-	reader, err := NewReader(bufio.NewReader(infile), testHeaders)
+	reader, err := NewReader(bufio.NewReader(bytes.NewBufferString(testInput)), testHeaders)
 	if err != nil {
 		t.Fatal("error while opening reader:", err)
 	}
-	for i_row, row := range testParsed {
+	for i_row, row := range testData {
 		rowParsed, err := reader.ReadRow()
 		if err != nil {
 			t.Fatal("error while reading row:", err)
@@ -72,5 +77,28 @@ func TestReader(t *testing.T) {
 	}
 	if _, err := reader.ReadRow(); err != io.EOF {
 		t.Error("expected EOF when last row was read")
+	}
+}
+
+func TestWriter(t *testing.T) {
+	outfile := &bytes.Buffer{}
+	writer, err := NewWriter(bufio.NewWriter(outfile), testHeaders)
+	if err != nil {
+		t.Fatal("error while opening writer:", err)
+	}
+	for _, row := range testData {
+		err := writer.WriteRow(row)
+		if err != nil {
+			t.Errorf("error writing row %#v: %s", row, err)
+		}
+	}
+	err = writer.Flush()
+	if err != nil {
+		t.Error("error while flushing:", err)
+	}
+
+	output := outfile.Bytes()
+	if !bytes.Equal([]byte(testOutput), output) {
+		t.Errorf("the expected and actual output does not match, expected and actual:\n%#v\n%#v\n", testOutput, string(output))
 	}
 }
