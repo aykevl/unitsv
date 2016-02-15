@@ -29,7 +29,6 @@
 package unitsv
 
 import (
-	"bufio"
 	"bytes"
 	"io"
 	"testing"
@@ -56,7 +55,7 @@ a	1	3002234232222342
 `
 
 func TestReader(t *testing.T) {
-	reader, err := NewReader(bufio.NewReader(bytes.NewBufferString(testInput)), testHeaders)
+	reader, err := NewReader(bytes.NewBufferString(testInput), testHeaders)
 	if err != nil {
 		t.Fatal("error while opening reader:", err)
 	}
@@ -82,7 +81,7 @@ func TestReader(t *testing.T) {
 
 func TestWriter(t *testing.T) {
 	outfile := &bytes.Buffer{}
-	writer, err := NewWriter(bufio.NewWriter(outfile), testHeaders)
+	writer, err := NewWriter(outfile, testHeaders)
 	if err != nil {
 		t.Fatal("error while opening writer:", err)
 	}

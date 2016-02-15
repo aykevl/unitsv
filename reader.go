@@ -45,8 +45,8 @@ type Reader struct {
 
 // NewReader creates a new TSV reader. Calling this function reads the header
 // and verifies it with the 'columns' parameter.
-func NewReader(in *bufio.Reader, columns []string) (*Reader, error) {
-	reader := textproto.NewReader(in)
+func NewReader(in io.Reader, columns []string) (*Reader, error) {
+	reader := textproto.NewReader(bufio.NewReader(in))
 
 	header, err := reader.ReadLine()
 	if err != nil && err != io.EOF {

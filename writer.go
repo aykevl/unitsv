@@ -30,6 +30,7 @@ package unitsv
 
 import (
 	"bufio"
+	"io"
 )
 
 type Writer struct {
@@ -38,9 +39,9 @@ type Writer struct {
 }
 
 // NewWriter writes the header and returns a new Writer.
-func NewWriter(out *bufio.Writer, columns []string) (*Writer, error) {
+func NewWriter(out io.Writer, columns []string) (*Writer, error) {
 	w := &Writer{
-		writer:       out,
+		writer:       bufio.NewWriter(out),
 		headerLength: len(columns),
 	}
 
@@ -86,8 +87,7 @@ func (w *Writer) WriteRow(row []string) error {
 	return err
 }
 
-// Flush flushes the underlying bufio.Writer. This is only necessary if you
-// don't flush it yourself.
+// Flush flushes the underlying bufio.Writer.
 func (w *Writer) Flush() error {
 	return w.writer.Flush()
 }
