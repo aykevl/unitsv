@@ -10,6 +10,3 @@ I have extended TSV in the following way:
   * Using escape characters (literal `\\`, `\n` and `\t`) to be able to
     represent any character.
   * Using (only) UTF-8 (hence 'Uni').
-
-For now, only reading TSV-formatted files is supported, and no tests have yet
-been written.
