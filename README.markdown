@@ -11,4 +11,4 @@ I have extended TSV in the following way:
     represent any character.
   * Using (only) UTF-8 (hence 'Uni').
 
-[![GoDoc](https://godoc.org/github.com/aykevl/unitsv?status.svg)](https://godoc.org/github.com/aykevl/unitsv)
+API reference: [![GoDoc](https://godoc.org/github.com/aykevl/unitsv?status.svg)](https://godoc.org/github.com/aykevl/unitsv)

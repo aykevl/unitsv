@@ -33,6 +33,7 @@ import (
 	"io"
 )
 
+// Writer implements writing a TSV file.
 type Writer struct {
 	writer       *bufio.Writer
 	headerLength int

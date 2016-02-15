@@ -26,10 +26,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// UniTSV is a simple library for reading and writing files in a TSV-like
-// format. The only differences with standard TSV (as specified by IANA) is that
-// it supports newlines and tabs via escape characters (\n, \t, \\) and that it
-// only uses UTF-8 instead of ASCII (as UTF-8 is the default in Go).
+// Package UniTSV is a simple library for reading and writing files in a
+// TSV-like format. The only differences with standard TSV (as specified by
+// IANA) is that it supports newlines and tabs via escape characters (\n, \t,
+// \\) and that it only uses UTF-8 instead of ASCII (as UTF-8 is the default in
+// Go).
 package unitsv
 
 import (
