@@ -41,6 +41,7 @@ type Reader struct {
 	reader       *textproto.Reader
 	columnMap    map[int]int // ReadRow() index mapped to file row index
 	headerLength int
+	rowLength    int
 }
 
 // Config should be passed to NewReader with at least one of Required or
@@ -88,15 +89,16 @@ func NewReader(in io.Reader, config Config) (*Reader, error) {
 		reader:       reader,
 		columnMap:    columnMap,
 		headerLength: len(fields),
+		rowLength:    len(config.Required) + len(config.Optional),
 	}
 
 	return r, nil
 }
 
-// ReadRow reads a single row from the TSV file. The returned slice is the same
-// length as the colum list provided in NewReader and has fields at the same
-// position as in the column list. The actual columns in the file may be at a
-// different index.
+// ReadRow reads a single row from the TSV file. The returned slice is the
+// length of the required and optional columns combined and has fields at the
+// same position as in the column list. The actual columns in the file may be at
+// a different index.
 func (r *Reader) ReadRow() ([]string, error) {
 	line, err := r.reader.ReadLine()
 	if err != nil {
@@ -110,7 +112,7 @@ func (r *Reader) ReadRow() ([]string, error) {
 	if len(fields) != r.headerLength {
 		return nil, ErrParsingTSV
 	}
-	row := make([]string, len(r.columnMap))
+	row := make([]string, r.rowLength)
 	for i := 0; i < len(r.columnMap); i++ {
 		row[i] = fields[r.columnMap[i]]
 	}

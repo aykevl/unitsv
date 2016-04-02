@@ -69,8 +69,8 @@ func TestReader(t *testing.T) {
 		if err != nil {
 			t.Fatal("error while reading row:", err)
 		}
-		if len(rowParsed) != len(row) {
-			t.Errorf("row length is not equal to header length for row %d", i_row)
+		if len(rowParsed) != len(row)+1 {
+			t.Errorf("row length is not equal to header length + 1 for row %d", i_row)
 			continue
 		}
 		for i_field, field := range row {
