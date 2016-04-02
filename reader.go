@@ -43,9 +43,16 @@ type Reader struct {
 	headerLength int
 }
 
+// Config should be passed to NewReader with at least one of Required or
+// Optional columns set.
+type Config struct {
+	Required []string // required columns
+	Optional []string // optional columns
+}
+
 // NewReader creates a new TSV reader. Calling this function reads the header
 // and verifies it with the 'columns' parameter.
-func NewReader(in io.Reader, columns []string) (*Reader, error) {
+func NewReader(in io.Reader, config Config) (*Reader, error) {
 	reader := textproto.NewReader(bufio.NewReader(in))
 
 	header, err := reader.ReadLine()
@@ -61,13 +68,20 @@ func NewReader(in io.Reader, columns []string) (*Reader, error) {
 		columnIndex[column] = i
 	}
 
-	columnMap := make(map[int]int, len(columns))
-	for i, column := range columns {
+	columnMap := make(map[int]int, len(config.Required)+len(config.Optional))
+	for i, column := range config.Required {
 		index, ok := columnIndex[column]
 		if !ok {
 			return nil, ErrColumns
 		}
 		columnMap[i] = index
+	}
+	for i, column := range config.Optional {
+		index, ok := columnIndex[column]
+		if !ok {
+			continue
+		}
+		columnMap[i+len(config.Required)] = index
 	}
 
 	r := &Reader{

@@ -34,13 +34,15 @@ import (
 	"testing"
 )
 
-var testInput = `header	header2	abc
-1	a	3002234232222342
-u		x
-ü	...	n
-\t	\n	\\n
+var testInput = `header	header2	unused	abc
+1	a	-	3002234232222342
+u		-	x
+ü	...	-	n
+\t	\n	-	\\n
 `
-var testHeaders = []string{"header2", "header", "abc"}
+var testHeadersReadRequired = []string{"header2", "header"}
+var testHeadersReadOptional = []string{"abc", "noheader"}
+var testHeadersWrite = []string{"header2", "header", "abc"}
 var testData = [][]string{
 	{"a", "1", "3002234232222342"},
 	{"", "u", "x"},
@@ -55,7 +57,10 @@ a	1	3002234232222342
 `
 
 func TestReader(t *testing.T) {
-	reader, err := NewReader(bytes.NewBufferString(testInput), testHeaders)
+	reader, err := NewReader(bytes.NewBufferString(testInput), Config{
+		Required: testHeadersReadRequired,
+		Optional: testHeadersReadOptional,
+	})
 	if err != nil {
 		t.Fatal("error while opening reader:", err)
 	}
@@ -81,7 +86,7 @@ func TestReader(t *testing.T) {
 
 func TestWriter(t *testing.T) {
 	outfile := &bytes.Buffer{}
-	writer, err := NewWriter(outfile, testHeaders)
+	writer, err := NewWriter(outfile, testHeadersWrite)
 	if err != nil {
 		t.Fatal("error while opening writer:", err)
 	}
