@@ -78,11 +78,9 @@ func NewReader(in io.Reader, config Config) (*Reader, error) {
 		columnMap[i] = index
 	}
 	for i, column := range config.Optional {
-		index, ok := columnIndex[column]
-		if !ok {
-			continue
+		if index, ok := columnIndex[column]; ok {
+			columnMap[i+len(config.Required)] = index
 		}
-		columnMap[i+len(config.Required)] = index
 	}
 
 	r := &Reader{
@@ -114,7 +112,9 @@ func (r *Reader) ReadRow() ([]string, error) {
 	}
 	row := make([]string, r.rowLength)
 	for i := 0; i < len(r.columnMap); i++ {
-		row[i] = fields[r.columnMap[i]]
+		if index, ok := r.columnMap[i]; ok {
+			row[i] = fields[index]
+		}
 	}
 	return row, nil
 }

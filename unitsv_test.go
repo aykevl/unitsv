@@ -78,6 +78,9 @@ func TestReader(t *testing.T) {
 				t.Errorf("expected and actual value differ (row %d, column %d, expected %#v, actual %#v)", i_row, i_field, field, rowParsed[i_field])
 			}
 		}
+		if rowParsed[len(rowParsed)-1] != "" {
+			t.Errorf("expected last line of row %d to be empty, got %#v", i_row, rowParsed[len(rowParsed)-1])
+		}
 	}
 	if _, err := reader.ReadRow(); err != io.EOF {
 		t.Error("expected EOF when last row was read")
