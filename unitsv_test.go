@@ -39,6 +39,9 @@ var testInput = `header	header2	unused	abc
 u		-	x
 ü	...	-	n
 \t	\n	-	\\n
+x	x	x	\\x
+x	x	x	\t
+x	x	x	\n
 `
 var testHeadersReadRequired = []string{"header2", "header"}
 var testHeadersReadOptional = []string{"abc", "noheader"}
@@ -48,12 +51,18 @@ var testData = [][]string{
 	{"", "u", "x"},
 	{"...", "ü", "n"},
 	{"\n", "\t", "\\n"},
+	{"x", "x", "\\x"},
+	{"x", "x", "\t"},
+	{"x", "x", "\n"},
 }
 var testOutput = `header2	header	abc
 a	1	3002234232222342
 	u	x
 ...	ü	n
 \n	\t	\\n
+x	x	\\x
+x	x	\t
+x	x	\n
 `
 
 func TestReader(t *testing.T) {
@@ -67,7 +76,7 @@ func TestReader(t *testing.T) {
 	for i_row, row := range testData {
 		rowParsed, err := reader.ReadRow()
 		if err != nil {
-			t.Fatal("error while reading row:", err)
+			t.Fatalf("error while reading row %d: %s", i_row, err)
 		}
 		if len(rowParsed) != len(row)+1 {
 			t.Errorf("row length is not equal to header length + 1 for row %d", i_row)
