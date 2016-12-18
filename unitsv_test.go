@@ -109,3 +109,11 @@ func TestWriter(t *testing.T) {
 		t.Errorf("the expected and actual output does not match, expected and actual:\n%#v\n%#v\n", testOutput, string(output))
 	}
 }
+
+func BenchmarkSplitTSVFields(b *testing.B) {
+	var fields []string
+	for n := 0; n < b.N; n++ {
+		fields, _ = splitTsvFields("test\tshort\ta\tthis is a longer field\tend")
+	}
+	_ = fields
+}
