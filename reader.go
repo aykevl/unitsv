@@ -123,7 +123,7 @@ func (r *Reader) ReadRow() ([]string, error) {
 func splitTsvFields(line string) ([]string, error) {
 	fields := strings.Split(line, "\t")
 	var field bytes.Buffer
-	for i := 0; i < len(fields); i++ {
+	for i, _ := range fields {
 		field.Reset()
 
 		// Fast path, for when there is no backslash.
