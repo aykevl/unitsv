@@ -122,8 +122,25 @@ func (r *Reader) ReadRow() ([]string, error) {
 // splitTsvFields separates tab-seapareted-values and unescapes them.
 func splitTsvFields(line string) ([]string, error) {
 	fields := strings.Split(line, "\t")
+	var field bytes.Buffer
 	for i := 0; i < len(fields); i++ {
-		var field bytes.Buffer
+		field.Reset()
+
+		// Fast path, for when there is no backslash.
+		fastpath := true
+		for _, c := range fields[i] {
+			if c == '\\' {
+				// Oops, we can't finish this fast path :(
+				// Restart again in the next loop.
+				fastpath = false
+			}
+		}
+		if fastpath {
+			// We're done, there are no backslashes. The destination is the same
+			// as the source, so we don't have to copy anything.
+			continue
+		}
+
 		escape := false
 		for _, c := range fields[i] {
 			if !escape {
